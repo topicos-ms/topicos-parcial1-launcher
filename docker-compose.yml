@@ -1,0 +1,157 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: topicos_redis
+    restart: always
+    ports:
+      - 6379:6379
+
+  nats-server:
+    image: nats:2.10-alpine
+    ports:
+      - 4222:4222
+      - 8222:8222
+
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: topicos_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  client-gateway:
+    build: ./client-gateway
+    command: npm run start:dev
+    volumes:
+      - ./client-gateway/src:/usr/src/app/src
+    ports:
+      - ${CLIENT_GATEWAY_PORT}:3000
+    env_file: ./.env
+    depends_on:
+      nats-server:
+        condition: service_started
+      redis:
+        condition: service_started
+      auth-ms:
+        condition: service_started
+
+  auth-ms:
+    build: ./auth-ms
+    command: npm run start:dev
+    volumes:
+      - ./auth-ms/src:/usr/src/app/src
+    env_file: ./.env
+    depends_on:
+      nats-server:
+        condition: service_started
+      redis:
+        condition: service_started
+      postgres-db:
+        condition: service_healthy
+    environment:
+      PORT: ${AUTH_MS_PORT}
+  programs-ms:
+    build: ./programs-ms
+    command: npm run start:dev
+    volumes:
+      - ./programs-ms/src:/usr/src/app/src
+    env_file: ./.env
+    depends_on:
+      nats-server:
+        condition: service_started
+      redis:
+        condition: service_started
+      postgres-db:
+        condition: service_healthy
+    environment:
+      PORT: ${PROGRAMS_MS_PORT}
+  calendar-ms:
+    build: ./calendar-ms
+    command: npm run start:dev
+    volumes:
+      - ./calendar-ms/src:/usr/src/app/src
+    env_file: ./.env
+    depends_on:
+      nats-server:
+        condition: service_started
+      redis:
+        condition: service_started
+      postgres-db:
+        condition: service_healthy
+    environment:
+      PORT: ${CALENDAR_MS_PORT}
+  facilities-ms:
+    build: ./facilities-ms
+    command: npm run start:dev
+    volumes:
+      - ./facilities-ms/src:/usr/src/app/src
+    env_file: ./.env
+    depends_on:
+      nats-server:
+        condition: service_started
+      redis:
+        condition: service_started
+      postgres-db:
+        condition: service_healthy
+    environment:
+      PORT: ${FACILITIES_MS_PORT}
+  teaching-ms:
+    build: ./teaching-ms
+    command: npm run start:dev
+    volumes:
+      - ./teaching-ms/src:/usr/src/app/src
+    env_file: ./.env
+    depends_on:
+      nats-server:
+        condition: service_started
+      redis:
+        condition: service_started
+      postgres-db:
+        condition: service_healthy
+    environment:
+      PORT: ${TEACHING_MS_PORT}
+  enrollments-ms:
+    build: ./enrollments-ms
+    command: npm run start:dev
+    volumes:
+      - ./enrollments-ms/src:/usr/src/app/src
+    env_file: ./.env
+    depends_on:
+      nats-server:
+        condition: service_started
+      redis:
+        condition: service_started
+      postgres-db:
+        condition: service_healthy
+    environment:
+      PORT: ${ENROLLMENTS_MS_PORT}
+  assessments-ms:
+    build: ./assessments-ms
+    command: npm run start:dev
+    volumes:
+      - ./assessments-ms/src:/usr/src/app/src
+    env_file: ./.env
+    depends_on:
+      nats-server:
+        condition: service_started
+      redis:
+        condition: service_started
+      postgres-db:
+        condition: service_healthy
+    environment:
+      PORT: ${ASSESSMENTS_MS_PORT}
+
+volumes:
+  postgres_data:
