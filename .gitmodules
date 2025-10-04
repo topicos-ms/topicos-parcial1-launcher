@@ -1,0 +1,24 @@
+[submodule "teaching-ms"]
+	path = teaching-ms
+	url = https://github.com/topicos-ms/teaching-ms
+[submodule "programs-ms"]
+	path = programs-ms
+	url = https://github.com/topicos-ms/programs-ms
+[submodule "facilities-ms"]
+	path = facilities-ms
+	url = https://github.com/topicos-ms/facilities-ms
+[submodule "enrollments-ms"]
+	path = enrollments-ms
+	url = https://github.com/topicos-ms/enrollments-ms
+[submodule "client-gateway"]
+	path = client-gateway
+	url = https://github.com/topicos-ms/client-gateway
+[submodule "calendar-ms"]
+	path = calendar-ms
+	url = https://github.com/topicos-ms/calendar-ms
+[submodule "auth-ms"]
+	path = auth-ms
+	url = https://github.com/topicos-ms/auth-ms
+[submodule "assessments-ms"]
+	path = assessments-ms
+	url = https://github.com/topicos-ms/assessments-ms
