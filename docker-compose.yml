@@ -45,7 +45,9 @@ services:
       redis:
         condition: service_started
       auth-ms:
-        condition: service_started
+        condition: service_healthy
+      assessments-ms:
+        condition: service_healthy
 
   auth-ms:
     build: ./auth-ms
@@ -62,6 +64,12 @@ services:
         condition: service_healthy
     environment:
       PORT: ${AUTH_MS_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:${AUTH_MS_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   programs-ms:
     build: ./programs-ms
     command: npm run start:dev
@@ -75,8 +83,16 @@ services:
         condition: service_started
       postgres-db:
         condition: service_healthy
+      auth-ms:
+        condition: service_healthy
     environment:
       PORT: ${PROGRAMS_MS_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:${PROGRAMS_MS_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   calendar-ms:
     build: ./calendar-ms
     command: npm run start:dev
@@ -90,8 +106,16 @@ services:
         condition: service_started
       postgres-db:
         condition: service_healthy
+      programs-ms:
+        condition: service_healthy
     environment:
       PORT: ${CALENDAR_MS_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:${CALENDAR_MS_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   facilities-ms:
     build: ./facilities-ms
     command: npm run start:dev
@@ -105,8 +129,16 @@ services:
         condition: service_started
       postgres-db:
         condition: service_healthy
+      calendar-ms:
+        condition: service_healthy
     environment:
       PORT: ${FACILITIES_MS_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:${FACILITIES_MS_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   teaching-ms:
     build: ./teaching-ms
     command: npm run start:dev
@@ -120,8 +152,16 @@ services:
         condition: service_started
       postgres-db:
         condition: service_healthy
+      facilities-ms:
+        condition: service_healthy
     environment:
       PORT: ${TEACHING_MS_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:${TEACHING_MS_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   enrollments-ms:
     build: ./enrollments-ms
     command: npm run start:dev
@@ -135,8 +175,16 @@ services:
         condition: service_started
       postgres-db:
         condition: service_healthy
+      teaching-ms:
+        condition: service_healthy
     environment:
       PORT: ${ENROLLMENTS_MS_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:${ENROLLMENTS_MS_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   assessments-ms:
     build: ./assessments-ms
     command: npm run start:dev
@@ -150,8 +198,16 @@ services:
         condition: service_started
       postgres-db:
         condition: service_healthy
+      enrollments-ms:
+        condition: service_healthy
     environment:
       PORT: ${ASSESSMENTS_MS_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:${ASSESSMENTS_MS_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 volumes:
   postgres_data:
